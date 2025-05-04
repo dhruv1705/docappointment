@@ -28,40 +28,46 @@ app.use(cors({
   credentials: true
 }))
 
-// Handle database connection at request time if not already connected
-const connectWithRetry = async () => {
+// Function to connect to DB and Cloudinary
+const initializeConnections = async () => {
   if (!isConnected) {
     try {
-      console.log("Attempting to connect to MongoDB...")
+      console.log("Attempting initial connection to MongoDB...")
       await connectDB()
       console.log("MongoDB connected successfully")
       
-      console.log("Attempting to connect to Cloudinary...")
+      console.log("Attempting initial connection to Cloudinary...")
       await connectCloudinary()
       console.log("Cloudinary connected successfully")
       
       isConnected = true
     } catch (error) {
-      console.error("Database connection error:", error.message)
-      throw error // Propagate error to be handled by route handlers
+      console.error("CRITICAL: Initial database or Cloudinary connection failed:", error.message, error.stack)
+      // Optional: You might want the process to exit if critical connections fail on startup
+      // process.exit(1); 
     }
   }
-}
+};
 
-// Middleware to ensure database connection before handling requests
-app.use(async (req, res, next) => {
-  try {
-    await connectWithRetry()
-    next()
-  } catch (error) {
-    console.error("Failed to connect to database:", error)
-    res.status(500).json({ 
+// Attempt connections immediately when the module loads
+initializeConnections().then(() => {
+  console.log("Initial connection attempts completed.");
+}).catch(error => {
+  // This catch is mostly for unhandled promise rejections from initializeConnections, though the internal try/catch should handle it.
+  console.error("CRITICAL: Unhandled error during initial connection:", error);
+});
+
+// Middleware to check database connection status before handling requests
+app.use((req, res, next) => {
+  if (!isConnected) {
+    console.error("Error: Database or Cloudinary not connected when handling request:", req.path);
+    return res.status(500).json({ 
       success: false, 
-      message: "Server configuration error, please try again later",
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    })
+      message: "Server configuration error, service not ready. Please try again later.",
+    });
   }
-})
+  next();
+});
 
 // api endpoints
 app.use("/api/user", userRouter)
