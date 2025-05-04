@@ -17,7 +17,7 @@ connectCloudinary()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({
-  origin: '*',
+  origin: ['https://docappointment-ecru.vercel.app', 'https://docappointment-admin.vercel.app', 'http://localhost:5173', 'http://localhost:5174'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'aToken', 'dToken'],
   credentials: true
