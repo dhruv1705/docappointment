@@ -2,14 +2,32 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
+// Use /tmp directory for uploads in serverless environments
+const uploadsDir = '/tmp/uploads';
+
 // Create uploads directory if it doesn't exist
-const uploadsDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+    try {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      console.log(`Successfully created directory: ${uploadsDir}`);
+    } catch (error) {
+      console.error(`Error creating directory ${uploadsDir}:`, error);
+      // Optionally handle the error, e.g., by throwing it or logging
+    }
 }
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
+        // Ensure the directory exists before attempting to save the file
+        if (!fs.existsSync(uploadsDir)) {
+          try {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+            console.log(`Re-created directory during request: ${uploadsDir}`);
+          } catch (error) {
+            console.error(`Error re-creating directory ${uploadsDir}:`, error);
+            return cb(error); // Pass error to multer
+          }
+        }
         cb(null, uploadsDir);
     },
     filename: function (req, file, cb) {
