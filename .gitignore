@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+**/node_modules/
+/.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**/.env
+
+# Build directories
+/build
+/dist
+**/build
+**/dist
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache directories
+.cache/
+.next/
+.nuxt/
+.vuepress/dist
+**/.cache
+
+# Testing
+/coverage
+
+# Production
+/build
+
+# IDE / OS specific files
+.DS_Store
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.project
+.classpath
+*.launch
+
+# Temporary files
+*.log
+logs
+tmp/
+temp/
+
+# Cloud upload directories
+uploads/
+/uploads
+
+# Package lock files (optional, but sometimes helpful to include)
+# package-lock.json
+# yarn.lock 
